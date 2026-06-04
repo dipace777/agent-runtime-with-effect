@@ -1,0 +1,27 @@
+{
+  "name": "agent-runtime",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "node --env-file-if-exists=.env src/index.ts",
+    "dev:watch": "node --env-file-if-exists=.env --watch-path=src/index.ts src/index.ts",
+    "start": "node --env-file-if-exists=.env dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.33.0",
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@effect/ai": "^0.35.0",
+    "@effect/ai-openai": "^0.39.2",
+    "@effect/platform-node": "^0.107.0",
+    "effect": "^3.21.2"
+  }
+}
