@@ -1,4 +1,4 @@
-import { SLIDE_H, SLIDE_W } from "./slide-schema";
+import { SLIDE_H, SLIDE_W } from "./slide-schema.ts";
 import type {
   BorderRadius,
   ChartElement,
@@ -15,7 +15,7 @@ import type {
   TextElement,
   TextListElement,
   TextRun,
-} from "./slide-schema";
+} from "./slide-schema.ts";
 
 export type ElementType = SlideElement["type"];
 export type ElementBox = { x: number; y: number; w: number; h: number };

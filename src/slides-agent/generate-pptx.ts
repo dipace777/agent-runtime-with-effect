@@ -12,13 +12,13 @@ import {
   type Stroke,
   type TableElement,
   type TextListElement,
-} from "./slide-schema";
+} from "./slide-schema.ts";
 import JSZip from "jszip";
 import {
   PPTY_DECK_SIDECAR_PATH,
   PPTY_IMAGE_PLACEHOLDER_TAG,
-} from "./pptx-tags";
-import { sanitizeSvgMarkup } from "./svg-sanitize";
+} from "./pptx-tags.ts";
+import { sanitizeSvgMarkup } from "./svg-sanitize.ts";
 import {
   averageBorderRadius,
   type ElementBox,
@@ -28,24 +28,28 @@ import {
   strokeColor,
   strokeWidth,
   textListStrings,
-} from "./element-model";
+} from "./element-model.ts";
 import {
   isLayoutElement,
   resolveElementLayout,
   resolveSlideLayout,
-} from "./layout-resolver";
-import { embedDeckImageData } from "./image-export";
+} from "./layout-resolver.ts";
+import { embedDeckImageData } from "./image-export.ts";
 import {
   fitBulletsFontToBox,
   fitFontToBox,
   wrapTextElementLines,
-} from "./text-measure";
+} from "./text-measure.ts";
 
 const VALIGN = { top: "top", middle: "middle", bottom: "bottom" } as const;
 const IMAGE_EXPORT_PX_PER_IN = 192;
 export type PptxChartMode = "native" | "shapes";
 export type GeneratePptxOptions = {
   chartMode?: PptxChartMode;
+};
+
+type FsPromises = {
+  writeFile: (path: string, data: Uint8Array) => Promise<void>;
 };
 
 type Writable<T> = T extends readonly [infer A, infer B, infer C, infer D]
@@ -62,6 +66,14 @@ function compact<const T extends object>(options: T): Compact<T> {
   return Object.fromEntries(
     Object.entries(options).filter(([, value]) => value !== undefined),
   ) as Compact<T>;
+}
+
+async function writeFile(path: string, data: Uint8Array): Promise<void> {
+  const loadFs = Function("return import('node:fs/promises')") as () => Promise<
+    FsPromises
+  >;
+  const fs = await loadFs();
+  await fs.writeFile(path, data);
 }
 
 function transparencyPct(opacity?: number): number {
@@ -1104,6 +1116,25 @@ export async function generatePptx(
   filename = "presentation.pptx",
   options: GeneratePptxOptions = {},
 ) {
+  const buffer = await generatePptxArrayBuffer(deck, options);
+
+  if (typeof document === "undefined") {
+    await writeFile(filename, new Uint8Array(buffer));
+    return;
+  }
+
+  triggerDownload(
+    new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    }),
+    filename,
+  );
+}
+
+export async function generatePptxArrayBuffer(
+  deck: Deck,
+  options: GeneratePptxOptions = {},
+) {
   const resolvedOptions: Required<GeneratePptxOptions> = {
     chartMode: options.chartMode ?? "native",
   };
@@ -1128,9 +1159,7 @@ export async function generatePptx(
   })) as ArrayBuffer;
   const zip = await JSZip.loadAsync(buffer);
   zip.file(PPTY_DECK_SIDECAR_PATH, JSON.stringify(exportDeck));
-  const finalBlob = await zip.generateAsync({ type: "blob" });
-
-  triggerDownload(finalBlob, filename);
+  return await zip.generateAsync({ type: "arraybuffer" });
 }
 
 function triggerDownload(blob: Blob, filename: string): void {

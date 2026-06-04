@@ -1,4 +1,4 @@
-import type { Deck, SlideElement } from "./slide-schema";
+import type { Deck, SlideElement } from "./slide-schema.ts";
 
 const resolvedImageCache = new Map<string, Promise<string | null>>();
 

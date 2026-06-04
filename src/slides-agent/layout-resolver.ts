@@ -10,12 +10,12 @@ import {
   type Padding,
   type Slide,
   type SlideElement,
-} from "./slide-schema";
+} from "./slide-schema.ts";
 import {
   boxToPositionSize,
   elementBox,
   type ElementBox,
-} from "./element-model";
+} from "./element-model.ts";
 
 export type RenderMode = "absolute" | "flow";
 

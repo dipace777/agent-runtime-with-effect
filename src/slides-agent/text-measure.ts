@@ -4,13 +4,13 @@ import {
   prepare,
   prepareWithSegments,
 } from "@chenglou/pretext";
-import type { BulletsElement, TextElement } from "./slide-schema";
+import type { BulletsElement, TextElement } from "./slide-schema.ts";
 import {
   elementBox,
   elementFont,
   textContent,
   textListStrings,
-} from "./element-model";
+} from "./element-model.ts";
 
 // Reference DPI used across the editor (`PX_PER_IN` in editorUtils). Keep
 // in sync — if that changes, this should too.
